@@ -91,6 +91,17 @@ Tick.prototype.setInterval = function interval(name, fn, ms) {
 };
 
 /**
+ * Check if we have a timer set.
+ *
+ * @param {String} name
+ * @returns {Boolean}
+ * @api public
+ */
+Tick.prototype.active = function active(name) {
+  return name in this.timers;
+};
+
+/**
  * Properly clean up all timeout references. If no arguments are supplied we
  * will attempt to clear every single timer that is present.
  *

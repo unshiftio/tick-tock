@@ -183,4 +183,16 @@ describe('ticktock', function () {
       }, 1010);
     });
   });
+
+  describe('#active', function () {
+    it('returns true if a timer is defined', function () {
+      assume(tock.active('foo')).is.false();
+
+      tock.setTimeout('foo', function () {});
+      assume(tock.active('foo')).is.true();
+
+      tock.clear();
+      assume(tock.active('foo')).is.false();
+    });
+  });
 });
