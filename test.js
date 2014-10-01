@@ -89,6 +89,65 @@ describe('ticktock', function () {
     });
   });
 
+  describe('#setInterval', function () {
+    it('adds a setInterval', function (next) {
+      var start = Date.now()
+        , i = 0;
+
+      tock.setInterval('test', function () {
+        var taken = Date.now() - start;
+
+        if (i === 0) {
+          assume(taken).is.above(5);
+          assume(taken).is.below(15);
+        } else {
+          next();
+        }
+
+        i++;
+      }, 10);
+    });
+
+    it('accepts strings for time', function (next) {
+      var start = Date.now()
+        , i = 0;
+
+      tock.setInterval('test', function () {
+        var taken = Date.now() - start;
+
+        if (i === 0) {
+          assume(taken).is.above(5);
+          assume(taken).is.below(15);
+        } else {
+          next();
+        }
+
+        i++;
+      }, '10 ms');
+    });
+
+    it('run with the same timeout if a known name is provided', function (next) {
+      var start = Date.now()
+        , j = 0
+        , i = 0;
+
+      tock.setInterval('test', function () {
+        j++;
+      }, '100 ms');
+
+      setTimeout(function () {
+        tock.setInterval('test', function () {
+          i++;
+
+          if (i === 10) {
+            assume(j).equals(i);
+            next();
+          }
+        }, '100 ms');
+      }, 20);
+    });
+  });
+
   describe('#setTimeout', function () {
     it('adds a setTimeout', function (next) {
       var start = Date.now();
