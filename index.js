@@ -140,7 +140,8 @@ Tick.parse = function time(ms) {
   if (!match) return 0;
 
   amount = parseFloat(match[1]);
-  switch ((match[2] || 'ms').toLowerCase()) {
+
+  switch (match[2].toLowerCase()) {
     case 'days':
     case 'day':
     case 'd':
