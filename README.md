@@ -61,6 +61,16 @@ tock.clear('foo, bar'); // Same as above.
 tock.clear(); // Nuke everything.
 ```
 
+### Tock.active()
+
+Check if there's an active timer for the given name and returns a boolean.
+
+```js
+tock.active('foo'); // true;
+tock.clear();
+tock.active('foo'); // false;
+```
+
 ## License
 
 MIT

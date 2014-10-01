@@ -1,6 +1,6 @@
 {
   "name": "tick-tock",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Timer management",
   "main": "index.js",
   "scripts": {
