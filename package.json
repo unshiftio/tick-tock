@@ -1,11 +1,16 @@
 {
   "name": "tick-tock",
   "version": "0.0.1",
-  "description": "Timer management",
+  "description": "Timer management, never forget to clear timers again",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec --ui bdd test.js",
-    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- --reporter spec --ui bdd test.js"
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- --reporter spec --ui bdd test.js",
+    "test-travis": "istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --ui bdd test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unshift/tick-tock"
   },
   "keywords": [
     "timer",
