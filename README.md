@@ -1,6 +1,8 @@
 # tick-tock
 
 [![Build Status](https://travis-ci.org/unshiftio/tick-tock.svg?branch=master)](https://travis-ci.org/unshiftio/tick-tock)
+[![NPM version](https://badge.fury.io/js/tick-tock.svg)](http://badge.fury.io/js/tick-tock)
+[![Coverage Status](https://img.shields.io/coveralls/unshiftio/tick-tock.svg)](https://coveralls.io/r/unshiftio/tick-tock?branch=master)
 
 `tick-tock` is a small timer and `setTimeout` management library. Nothing to
 fancy, but fancy enough to make your code more readable.
