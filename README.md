@@ -1,5 +1,7 @@
 # tick-tock
 
+[![Build Status](https://travis-ci.org/unshiftio/tick-tock.svg?branch=master)](https://travis-ci.org/unshiftio/tick-tock)
+
 `tick-tock` is a small timer and `setTimeout` management library. Nothing to
 fancy, but fancy enough to make your code more readable.
 
