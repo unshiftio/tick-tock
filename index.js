@@ -48,14 +48,12 @@ Tick.prototype.tock = function ticktock(name, clear) {
  * @api public
  */
 Tick.prototype.setTimeout = function timeout(name, fn, ms) {
-  var tock = this;
-
-  if (tock.timers[name]) {
-    tock.timers[name].fns.push(fn);
-    return tock;
+  if (this.timers[name]) {
+    this.timers[name].fns.push(fn);
+    return this;
   }
 
-  tock.timers[name] = {
+  this.timers[name] = {
     clear: clearTimeout,
     timer: setTimeout(this.tock(name, true), Tick.parse(ms)),
     fns: [fn]
@@ -74,14 +72,12 @@ Tick.prototype.setTimeout = function timeout(name, fn, ms) {
  * @api public
  */
 Tick.prototype.setInterval = function interval(name, fn, ms) {
-  var tock = this;
-
-  if (tock.timers[name]) {
-    tock.timers[name].fns.push(fn);
-    return tock;
+  if (this.timers[name]) {
+    this.timers[name].fns.push(fn);
+    return this;
   }
 
-  tock.timers[name] = {
+  this.timers[name] = {
     clear: clearInterval,
     timer: setInterval(this.tock(name), Tick.parse(ms)),
     fns: [fn]
