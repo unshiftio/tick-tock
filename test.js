@@ -5,6 +5,10 @@ describe('ticktock', function () {
     , Tick = require('./')
     , tock;
 
+  function fail() {
+    throw new Error('I should never be executed');
+  }
+
   beforeEach(function () {
     tock = new Tick();
   });
@@ -199,10 +203,6 @@ describe('ticktock', function () {
   });
 
   describe('#clear', function () {
-    function fail() {
-      throw new Error('I should never be executed');
-    }
-
     it('clears multiple timeouts', function (next) {
       tock.setTimeout('timer', fail, '1 second');
       tock.setTimeout('timer', fail, '1 second');
@@ -252,6 +252,43 @@ describe('ticktock', function () {
 
       tock.clear();
       assume(tock.active('foo')).is.false();
+    });
+  });
+
+  describe('#adjust', function () {
+    it('adjusts nothing for unknown timers', function () {
+      tock.adjust('foo', '1 second');
+    });
+
+    it('adjusts the timeout', function (next) {
+      tock.setTimeout('timer', fail, '10 ms');
+      tock.adjust('timer', '1 second');
+
+      setTimeout(function () {
+        tock.clear();
+        next();
+      }, 500);
+    });
+
+    it('adjusts the interval', function (next) {
+      var ticked = false;
+
+      tock.setInterval('foo', function () {
+        var spend = Date.now() - start;
+
+        if (spend < 30) {
+          tock.adjust('foo', '100 ms');
+          ticked = true;
+        } else if(spend < 150) {
+          if (!ticked) throw new Error('I should have ticked');
+          tock.clear();
+          next();
+        }
+
+        start = Date.now();
+      });
+
+      var start = Date.now();
     });
   });
 });

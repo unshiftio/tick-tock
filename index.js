@@ -129,6 +129,25 @@ Tick.prototype.clear = function clear() {
 };
 
 /**
+ * Adjust a timeout or interval to a new duration.
+ *
+ * @returns {Tick}
+ * @api public
+ */
+Tick.prototype.adjust = function adjust(name, ms) {
+  var timer = this.timers[name]
+    , interval;
+
+  if (!timer) return this;
+
+  interval = timer.clear === clearInterval;
+  timer.clear(timer.timer);
+  timer.timer = (interval ? setInterval : setTimeout)(this.tock(name, !interval), Tick.parse(ms));
+
+  return this;
+};
+
+/**
  * Parse a time string and return the number value of it.
  *
  * @returns {Number}

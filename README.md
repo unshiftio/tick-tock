@@ -27,6 +27,8 @@ var Tick = require('tick-tock')
   , tock = new Tick();
 ```
 
+All methods return `this` unless stated otherwise. 
+
 ### Tock.setTimeout()
 
 The `setTimeout` method adds as you might have expected.. a new setTimeout. The
@@ -73,6 +75,21 @@ Check if there's an active timer for the given name and returns a boolean.
 tock.active('foo'); // true;
 tock.clear();
 tock.active('foo'); // false;
+```
+
+### Tock.adjust()
+
+There are cases where you sometimes need to update or change the interval of an
+`setTimeout` or `setInterval` for example in the case of a setTimeout which
+coordinates a heartbeat. In order to make this easier you call the `.adjust`
+method with the name of the timeout that you want to adjust and the new
+interval/timeout.
+
+```js
+tock.setTimeout('heartbeat timeout', function () {});
+
+// you recieved a new heartbeat so you want to reset or adjust the heartbeat;
+tock.adjust('heartbeat timeout', '1 second');
 ```
 
 ## License
