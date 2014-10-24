@@ -27,7 +27,21 @@ var Tick = require('tick-tock')
   , tock = new Tick();
 ```
 
-All methods return `this` unless stated otherwise. 
+All methods return `this` unless stated otherwise. The constructor can be
+initialized with 1 argument:
+
+1. `context` This is the default context in which each `setTimeout` or
+   `setInterval` function is executed (it sets the `this` value). If nothing is
+   supplied it will default to your `tick-tock` instance.
+
+The following methods are available on your constructed instance:
+
+- [Tock.setTimeout(name, fn, timeout)](#tocksettimeout)
+- [Tock.setInterval(name, fn, interval)](#tocksetinterval)
+- [Tock.clear(name, name, ..)](#tockclear)
+- [Tock.active(name)](#tockactive)
+- [Tock.adjust(name, duration)](#tockadjust)
+- [Tock.end()](#tockend)
 
 ### Tock.setTimeout()
 
@@ -90,6 +104,18 @@ tock.setTimeout('heartbeat timeout', function () {});
 
 // you recieved a new heartbeat so you want to reset or adjust the heartbeat;
 tock.adjust('heartbeat timeout', '1 second');
+```
+
+### Tock.end()
+
+You no longer wish to interact with your instance and wants it to be fully shut
+down. This kills all active timers using `tock.clear()` and nulls the internal
+properties. It will return `true` if it's the first time it's destroyed and
+`false` if was already destroyed before. If you call any of the other methods
+after destruction, they will throw errors.
+
+```js
+tock.end();
 ```
 
 ## License
