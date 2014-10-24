@@ -4,12 +4,14 @@
  * Simple timer management.
  *
  * @constructor
+ * @param {Mixed} context Context of the callbacks that we execute.
  * @api public
  */
-function Tick() {
-  if (!(this instanceof Tick)) return new Tick();
+function Tick(context) {
+  if (!(this instanceof Tick)) return new Tick(context);
 
   this.timers = {};
+  this.context = context || this;
 }
 
 /**
@@ -33,7 +35,7 @@ Tick.prototype.tock = function ticktock(name, clear) {
 
     if (clear) tock.clear(name);
     for (var i = 0, l = fns.length; i < l; i++) {
-      fns[i]();
+      fns[i].call(tock.context);
     }
   };
 };
@@ -126,6 +128,21 @@ Tick.prototype.clear = function clear() {
   }
 
   return this;
+};
+
+/**
+ * We will no longer use this module, prepare your self for global cleanups.
+ *
+ * @returns {Boolean}
+ * @api public
+ */
+Tick.prototype.end = function end() {
+  if (!this.context) return false;
+
+  this.clear();
+  this.context = this.timers = null;
+
+  return true;
 };
 
 /**

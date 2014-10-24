@@ -9,12 +9,14 @@ describe('ticktock', function () {
     throw new Error('I should never be executed');
   }
 
+  context = { foo: 'bar' };
+
   beforeEach(function () {
     tock = new Tick();
   });
 
   afterEach(function () {
-    tock.clear();
+    tock.end();
   });
 
   this.timeout(30000);
@@ -101,6 +103,8 @@ describe('ticktock', function () {
       tock.setInterval('test', function () {
         var taken = Date.now() - start;
 
+        assume(this).equals(tock);
+
         if (i === 0) {
           assume(taken).is.above(5);
           assume(taken).is.below(15);
@@ -109,6 +113,17 @@ describe('ticktock', function () {
         }
 
         i++;
+      }, 10);
+    });
+
+    it('can be called with a custom context', function (next) {
+      var tock = new Tick(context);
+
+      tock.setInterval('test', function () {
+        assume(this).deep.equals(context);
+        tock.clear();
+
+        next();
       }, 10);
     });
 
@@ -158,9 +173,21 @@ describe('ticktock', function () {
 
       tock.setTimeout('test', function () {
         var taken = Date.now() - start;
+        assume(this).deep.equals(tock);
 
         assume(taken).is.above(5);
         assume(taken).is.below(15);
+
+        next();
+      }, 10);
+    });
+
+    it('can be called with a custom context', function (next) {
+      var tock = new Tick(context);
+
+      tock.setTimeout('test', function () {
+        assume(this).deep.equals(context);
+        tock.clear();
 
         next();
       }, 10);
@@ -289,6 +316,17 @@ describe('ticktock', function () {
       });
 
       var start = Date.now();
+    });
+  });
+
+  describe('#end', function () {
+    it('returns true when its cleared the first time', function () {
+      assume(tock.end()).is.true();
+    });
+
+    it('returns false when already cleared', function () {
+      assume(tock.end()).is.true();
+      assume(tock.end()).is.false();
     });
   });
 });
