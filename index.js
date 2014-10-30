@@ -2,6 +2,23 @@
 
 var has = Object.prototype.hasOwnProperty;
 
+//
+// Attempt to detect if we have support for setImmediate or process.nextTick so
+// we can use it in our setImmediate function.
+//
+var next = 'object' === typeof process && 'function' === process.nextTick
+  ? process.nextTick
+  : null;
+
+//
+// The process.nexTick doesn't have a way to cancel the scheduled tick so we
+// detect it first and know that when next is a function we cannot clear it.
+//
+if ('function' === typeof setImmediate) next = {
+  clearImmediate: clearImmediate,
+  setImmediate: setImmediate
+};
+
 /**
  * Simple timer management.
  *
@@ -58,8 +75,8 @@ Tick.prototype.setTimeout = function timeout(name, fn, ms) {
   }
 
   this.timers[name] = {
-    clear: clearTimeout,
     timer: setTimeout(this.tock(name, true), Tick.parse(ms)),
+    clear: clearTimeout,
     fns: [fn]
   };
 
@@ -82,8 +99,32 @@ Tick.prototype.setInterval = function interval(name, fn, ms) {
   }
 
   this.timers[name] = {
-    clear: clearInterval,
     timer: setInterval(this.tock(name), Tick.parse(ms)),
+    clear: clearInterval,
+    fns: [fn]
+  };
+
+  return this;
+};
+
+/**
+ *
+ * @param {String} name Name of the timer.
+ * @param {Function} fn Completion callback.
+ * @returns {Tick}
+ * @api public
+ */
+Tick.prototype.setImmediate = function immediate(name, fn) {
+  if (!next) return this.setTimeout(name, fn, 0);
+
+  if (this.timers[name]) {
+    this.timers[name].fns.push(fn);
+    return this;
+  }
+
+  this.timers[name] = {
+    timer: (next.setImmediate || next)(this.tock(name)),
+    clear: next.clearImmediate,
     fns: [fn]
   };
 

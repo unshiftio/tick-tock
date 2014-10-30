@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 describe('ticktock', function () {
   'use strict';
 
@@ -164,6 +165,41 @@ describe('ticktock', function () {
           }
         }, '100 ms');
       }, 20);
+    });
+  });
+
+  describe('#setImmediate', function () {
+    it('adds a setImmediate', function (next) {
+      var start = Date.now();
+
+      tock.setImmediate('test', function () {
+        var taken = Date.now() - start;
+
+        assume(this).equals(tock);
+        assume(taken).is.below(5);
+
+        next();
+      });
+    });
+
+    it('can be called with a custom context', function (next) {
+      var tock = new Tick(context);
+
+      tock.setImmediate('test', function () {
+        assume(this).deep.equals(context);
+        next();
+      });
+    });
+
+    it('can be cleared', function (next) {
+      var tock = new Tick(context);
+
+      tock.setImmediate('test', function () {
+        throw new Error('I should die');
+      });
+
+      tock.clear('test');
+      setTimeout(next, 100);
     });
   });
 
