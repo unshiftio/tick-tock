@@ -1,5 +1,7 @@
 'use strict';
 
+var has = Object.prototype.hasOwnProperty;
+
 /**
  * Simple timer management.
  *
@@ -116,14 +118,18 @@ Tick.prototype.clear = function clear() {
   }
 
   if (!args.length) {
-    for (timer in this.timers) args.push(timer);
+    for (timer in this.timers) {
+      if (has.call(this.timers, timer)) args.push(timer);
+    }
   }
 
   for (i = 0, l = args.length; i < l; i++) {
-    if (!(args[i] in this.timers)) continue;
+    timer = this.timers[args[i]];
 
-    this.timers[args[i]].clear(this.timers[args[i]].timer);
-    this.timers[args[i]].fns.length = 0;
+    if (!timer) continue;
+    if (timer.clear) timer.clear(timer.timer);
+
+    timer.fns.length = 0;
     delete this.timers[args[i]];
   }
 
