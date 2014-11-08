@@ -1,8 +1,6 @@
 # tick-tock
 
-[![Build Status](https://travis-ci.org/unshiftio/tick-tock.svg?branch=master)](https://travis-ci.org/unshiftio/tick-tock)
-[![NPM version](https://badge.fury.io/js/tick-tock.svg)](http://badge.fury.io/js/tick-tock)
-[![Coverage Status](https://img.shields.io/coveralls/unshiftio/tick-tock.svg)](https://coveralls.io/r/unshiftio/tick-tock?branch=master)
+[![Made by unshift](https://img.shields.io/badge/made%20by-unshift-00ffcc.svg?style=flat-square)](http://unshift.io)[![Version npm](http://img.shields.io/npm/v/tick-tock.svg?style=flat-square)](http://browsenpm.org/package/tick-tock)[![Build Status](http://img.shields.io/travis/unshiftio/tick-tock/master.svg?style=flat-square)](https://travis-ci.org/unshiftio/tick-tock)[![Dependencies](https://img.shields.io/david/unshiftio/tick-tock.svg?style=flat-square)](https://david-dm.org/unshiftio/tick-tock)[![Coverage Status](http://img.shields.io/coveralls/unshiftio/tick-tock/master.svg?style=flat-square)](https://coveralls.io/r/unshiftio/tick-tock?branch=master)[![IRC channel](http://img.shields.io/badge/IRC-irc.freenode.net%23unshift-00a8ff.svg?style=flat-square)](http://webchat.freenode.net/?channels=unshift)
 
 `tick-tock` is a small timer and `setTimeout` management library. Nothing to
 fancy, but fancy enough to make your code more readable.
