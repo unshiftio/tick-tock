@@ -123,7 +123,7 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   }
 
   this.timers[name] = {
-    timer: (next.setImmediate || next)(this.tock(name)),
+    timer: (next.setImmediate || next)(this.tock(name, true)),
     clear: next.clearImmediate,
     fns: [fn]
   };

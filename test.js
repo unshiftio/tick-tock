@@ -201,6 +201,16 @@ describe('ticktock', function () {
       tock.clear('test');
       setTimeout(next, 100);
     });
+
+    it('clear it self after execution', function (next) {
+      var tock = new Tick(context);
+
+      tock.setImmediate('test', function () {
+        tock.setImmediate('test', function () {
+          next();
+        });
+      });
+    });
   });
 
   describe('#setTimeout', function () {
