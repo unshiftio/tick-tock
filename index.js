@@ -183,7 +183,7 @@ Tick.prototype.clear = function clear() {
  * @returns {Boolean}
  * @api public
  */
-Tick.prototype.end = function end() {
+Tick.prototype.end = Tick.prototype.destroy = function end() {
   if (!this.context) return false;
 
   this.clear();
