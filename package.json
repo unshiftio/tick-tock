@@ -1,6 +1,6 @@
 {
   "name": "tick-tock",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Timer management, never forget to clear timers again",
   "main": "index.js",
   "scripts": {
@@ -35,5 +35,8 @@
     "istanbul": "0.3.x",
     "mocha": "2.0.x",
     "pre-commit": "0.0.x"
+  },
+  "dependencies": {
+    "millisecond": "0.0.x"
   }
 }
