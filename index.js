@@ -108,6 +108,7 @@ Tick.prototype.setInterval = function interval(name, fn, ms) {
 };
 
 /**
+ * Add a new setImmediate.
  *
  * @param {String} name Name of the timer.
  * @param {Function} fn Completion callback.
