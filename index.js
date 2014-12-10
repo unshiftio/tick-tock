@@ -1,6 +1,7 @@
 'use strict';
 
-var has = Object.prototype.hasOwnProperty;
+var has = Object.prototype.hasOwnProperty
+  , ms = require('millisecond');
 
 //
 // Attempt to detect if we have support for setImmediate or process.nextTick so
@@ -46,14 +47,16 @@ Tick.prototype.tock = function ticktock(name, clear) {
   var tock = this;
 
   return function tickedtock() {
-    var timer = tock.timers[name]
-      , fns;
+    if (!(name in tock.timers)) return;
 
-    if (!timer) return;
-    fns = timer.fns.slice();
+    var timer = tock.timers[name]
+      , fns = timer.fns.slice()
+      , l = fns.length
+      , i = 0;
 
     if (clear) tock.clear(name);
-    for (var i = 0, l = fns.length; i < l; i++) {
+
+    for (; i < l; i++) {
       fns[i].call(tock.context);
     }
   };
@@ -64,23 +67,25 @@ Tick.prototype.tock = function ticktock(name, clear) {
  *
  * @param {String} name Name of the timer.
  * @param {Function} fn Completion callback.
- * @param {Mixed} ms Duration of the timer.
+ * @param {Mixed} time Duration of the timer.
  * @returns {Tick}
  * @api public
  */
-Tick.prototype.setTimeout = function timeout(name, fn, ms) {
-  if (this.timers[name]) {
-    this.timers[name].fns.push(fn);
-    return this;
+Tick.prototype.setTimeout = function timeout(name, fn, time) {
+  var tick = this;
+
+  if (tick.timers[name]) {
+    tick.timers[name].fns.push(fn);
+    return tick;
   }
 
-  this.timers[name] = {
-    timer: setTimeout(this.tock(name, true), Tick.parse(ms)),
+  tick.timers[name] = {
+    timer: setTimeout(tick.tock(name, true), ms(time)),
     clear: clearTimeout,
     fns: [fn]
   };
 
-  return this;
+  return tick;
 };
 
 /**
@@ -88,23 +93,25 @@ Tick.prototype.setTimeout = function timeout(name, fn, ms) {
  *
  * @param {String} name Name of the timer.
  * @param {Function} fn Completion callback.
- * @param {Mixed} ms Interval of the timer.
+ * @param {Mixed} time Interval of the timer.
  * @returns {Tick}
  * @api public
  */
-Tick.prototype.setInterval = function interval(name, fn, ms) {
-  if (this.timers[name]) {
-    this.timers[name].fns.push(fn);
-    return this;
+Tick.prototype.setInterval = function interval(name, fn, time) {
+  var tick = this;
+
+  if (tick.timers[name]) {
+    tick.timers[name].fns.push(fn);
+    return tick;
   }
 
-  this.timers[name] = {
-    timer: setInterval(this.tock(name), Tick.parse(ms)),
+  tick.timers[name] = {
+    timer: setInterval(tick.tock(name), ms(time)),
     clear: clearInterval,
     fns: [fn]
   };
 
-  return this;
+  return tick;
 };
 
 /**
@@ -116,20 +123,22 @@ Tick.prototype.setInterval = function interval(name, fn, ms) {
  * @api public
  */
 Tick.prototype.setImmediate = function immediate(name, fn) {
-  if (!next) return this.setTimeout(name, fn, 0);
+  var tick = this;
 
-  if (this.timers[name]) {
-    this.timers[name].fns.push(fn);
-    return this;
+  if (!next) return tick.setTimeout(name, fn, 0);
+
+  if (tick.timers[name]) {
+    tick.timers[name].fns.push(fn);
+    return tick;
   }
 
-  this.timers[name] = {
-    timer: (next.setImmediate || next)(this.tock(name, true)),
+  tick.timers[name] = {
+    timer: (next.setImmediate || next)(tick.tock(name, true)),
     clear: next.clearImmediate,
     fns: [fn]
   };
 
-  return this;
+  return tick;
 };
 
 /**
@@ -153,6 +162,7 @@ Tick.prototype.active = function active(name) {
  */
 Tick.prototype.clear = function clear() {
   var args = arguments.length ? arguments : []
+    , tick = this
     , timer, i, l;
 
   if (args.length === 1 && 'string' === typeof args[0]) {
@@ -160,22 +170,22 @@ Tick.prototype.clear = function clear() {
   }
 
   if (!args.length) {
-    for (timer in this.timers) {
-      if (has.call(this.timers, timer)) args.push(timer);
+    for (timer in tick.timers) {
+      if (has.call(tick.timers, timer)) args.push(timer);
     }
   }
 
   for (i = 0, l = args.length; i < l; i++) {
-    timer = this.timers[args[i]];
+    timer = tick.timers[args[i]];
 
     if (!timer) continue;
     if (timer.clear) timer.clear(timer.timer);
 
-    timer.fns.length = 0;
-    delete this.timers[args[i]];
+    timer.fns = timer.timer = timer.clear = null;
+    delete tick.timers[args[i]];
   }
 
-  return this;
+  return tick;
 };
 
 /**
@@ -199,26 +209,20 @@ Tick.prototype.end = Tick.prototype.destroy = function end() {
  * @returns {Tick}
  * @api public
  */
-Tick.prototype.adjust = function adjust(name, ms) {
-  var timer = this.timers[name]
-    , interval;
+Tick.prototype.adjust = function adjust(name, time) {
+  var interval
+    , tick = this
+    , timer = tick.timers[name];
 
-  if (!timer) return this;
+  if (!timer) return tick;
 
   interval = timer.clear === clearInterval;
   timer.clear(timer.timer);
-  timer.timer = (interval ? setInterval : setTimeout)(this.tock(name, !interval), Tick.parse(ms));
+  timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
 
-  return this;
+  return tick;
 };
 
-/**
- * Parse a time string and return the number value of it.
- *
- * @returns {Number}
- * @api private
- */
-Tick.parse = require('millisecond');
 //
 // Expose the timer factory.
 //
