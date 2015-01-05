@@ -1,15 +1,8 @@
 'use strict';
 
 var has = Object.prototype.hasOwnProperty
-  , ms = require('millisecond');
-
-//
-// Attempt to detect if we have support for setImmediate or process.nextTick so
-// we can use it in our setImmediate function.
-//
-var next = 'object' === typeof process && 'function' === process.nextTick
-  ? process.nextTick
-  : null;
+  , ms = require('millisecond')
+  , next = null;
 
 //
 // The process.nexTick doesn't have a way to cancel the scheduled tick so we
