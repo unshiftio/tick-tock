@@ -1,6 +1,6 @@
 {
   "name": "tick-tock",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Timer management, never forget to clear timers again",
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/unshiftio/tick-tock"
-  },
-  "browser": {
-    "process": false
   },
   "keywords": [
     "timer",
