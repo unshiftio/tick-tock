@@ -1,6 +1,6 @@
 {
   "name": "tick-tock",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Timer management, never forget to clear timers again",
   "main": "index.js",
   "scripts": {
