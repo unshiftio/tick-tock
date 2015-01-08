@@ -10,6 +10,11 @@ describe('ticktock', function () {
     throw new Error('I should never be executed');
   }
 
+  //
+  // Make sure that we do not break on missing hasOwn checks.
+  //
+  Object.prototype.checkHasOwn = true;
+
   context = { foo: 'bar' };
 
   beforeEach(function () {
@@ -30,6 +35,28 @@ describe('ticktock', function () {
     var tick = Tick();
 
     assume(tick).is.instanceOf(Tick);
+  });
+
+  describe('#tock', function () {
+    it('returns a function', function () {
+      assume(tock.tock('name')).is.a('function');
+    });
+
+    it('is save to execute', function () {
+      tock.tock('name')();
+    });
+
+    it('can execute timers', function () {
+      var called = false;
+
+      tock.setTimeout('function', function () {
+        called = true;
+      }, 0);
+
+      assume(called).is.false();
+      tock.tock('function', true)();
+      assume(called).is.true();
+    });
   });
 
   describe('#setInterval', function () {
@@ -146,6 +173,27 @@ describe('ticktock', function () {
           next();
         });
       });
+    });
+
+    it('run with the same timeout if a known name is provided', function (next) {
+      var ticks = [];
+
+      tock.setImmediate('test', function () {
+        ticks.push(1);
+      });
+
+      tock.setImmediate('test', function () {
+        ticks.push(2);
+        assume(ticks.join()).equals('1,2');
+        next();
+      });
+
+      assume(tock.timers.test.fns).is.length(2);
+    });
+
+    it('fallsback to setTimeout if setImmediate does not exist', function (next) {
+      setImmediate = null;
+      tock.setImmediate('test', next);
     });
   });
 
