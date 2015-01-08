@@ -71,7 +71,7 @@ describe('ticktock', function () {
 
         if (i === 0) {
           assume(taken).is.above(5);
-          assume(taken).is.below(15);
+          assume(taken).is.below(25);
         } else {
           next();
         }
@@ -100,7 +100,7 @@ describe('ticktock', function () {
 
         if (i === 0) {
           assume(taken).is.above(5);
-          assume(taken).is.below(15);
+          assume(taken).is.below(25);
         } else {
           next();
         }
@@ -191,6 +191,7 @@ describe('ticktock', function () {
       assume(tock.timers.test.fns).is.length(2);
     });
 
+    if ('function' === typeof setImmediate)
     it('fallsback to setTimeout if setImmediate does not exist', function (next) {
       setImmediate = null;
       tock.setImmediate('test', next);
