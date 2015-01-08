@@ -149,7 +149,7 @@ Tick.prototype.clear = function clear() {
     , timer, i, l;
 
   if (args.length === 1 && 'string' === typeof args[0]) {
-    args = args[0].split(/[\,|\s]+/);
+    args = args[0].split(/[, ]+/);
   }
 
   if (!args.length) {
