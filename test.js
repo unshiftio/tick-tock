@@ -191,7 +191,7 @@ describe('ticktock', function () {
       assume(tock.timers.test.fns).is.length(2);
     });
 
-    if ('function' === typeof setImmediate)
+    if ('function' !== typeof setImmediate)
     it('fallsback to setTimeout if setImmediate does not exist', function (next) {
       setImmediate = null;
       tock.setImmediate('test', next);
