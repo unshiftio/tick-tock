@@ -108,7 +108,6 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
 Tick.prototype.setImmediate = function immediate(name, fn) {
   var tick = this;
 
-  /* istanbul ignore if */
   if ('function' !== typeof setImmediate) return tick.setTimeout(name, fn, 0);
 
   if (tick.timers[name]) {
