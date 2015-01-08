@@ -1,17 +1,7 @@
 'use strict';
 
 var has = Object.prototype.hasOwnProperty
-  , ms = require('millisecond')
-  , next = null;
-
-//
-// The process.nexTick doesn't have a way to cancel the scheduled tick so we
-// detect it first and know that when next is a function we cannot clear it.
-//
-if ('function' === typeof setImmediate) next = {
-  clearImmediate: clearImmediate,
-  setImmediate: setImmediate
-};
+  , ms = require('millisecond');
 
 /**
  * Simple timer management.
@@ -118,7 +108,7 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
 Tick.prototype.setImmediate = function immediate(name, fn) {
   var tick = this;
 
-  if (!next) return tick.setTimeout(name, fn, 0);
+  if ('function' !== typeof setImmediate) return tick.setTimeout(name, fn, 0);
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
@@ -126,8 +116,8 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   }
 
   tick.timers[name] = {
-    timer: (next.setImmediate || next)(tick.tock(name, true)),
-    clear: next.clearImmediate,
+    timer: setImmediate(tick.tock(name, true)),
+    clear: clearImmediate,
     fns: [fn]
   };
 
@@ -172,7 +162,7 @@ Tick.prototype.clear = function clear() {
     timer = tick.timers[args[i]];
 
     if (!timer) continue;
-    if (timer.clear) timer.clear(timer.timer);
+    timer.clear(timer.timer);
 
     timer.fns = timer.timer = timer.clear = null;
     delete tick.timers[args[i]];
