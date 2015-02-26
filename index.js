@@ -90,7 +90,7 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
 
   tick.timers[name] = {
     timer: setInterval(tick.tock(name), ms(time)),
-    clear: clearInterval,
+    clear: clearInterval.bind(null),
     fns: [fn]
   };
 
