@@ -64,7 +64,7 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
 
   tick.timers[name] = {
     timer: setTimeout(tick.tock(name, true), ms(time)),
-    clear: clearTimeout,
+    clear: function(id) { clearTimeout(id); },
     fns: [fn]
   };
 
@@ -90,7 +90,7 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
 
   tick.timers[name] = {
     timer: setInterval(tick.tock(name), ms(time)),
-    clear: clearInterval.bind(null),
+    clear: function(id) { clearInterval(id); },
     fns: [fn]
   };
 
@@ -117,7 +117,7 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
 
   tick.timers[name] = {
     timer: setImmediate(tick.tock(name, true)),
-    clear: clearImmediate,
+    clear: function(id) { clearImmediate(id); },
     fns: [fn]
   };
 
