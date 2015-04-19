@@ -31,6 +31,19 @@ Timer.INTERVAL  = 2;
 Timer.IMMEDIATE = 3;
 
 /**
+ * Custom wrappers for the various of clear{whatever} functions. We cannot
+ * invoke them directly as this will cause thrown errors in Google Chrome with
+ * an Illegal Invocation Error
+ *
+ * @see #2
+ * @type {Function}
+ * @api private
+ */
+function unsetTimeout(id) { clearTimeout(id); }
+function unsetInterval(id) { clearInterval(id); }
+function unsetImmediate(id) { clearImmediate(id); }
+
+/**
  * Simple timer management.
  *
  * @constructor
@@ -92,7 +105,7 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
   tick.timers[name] = new Timer(
     Timer.TIMEOUT,
     setTimeout(tick.tock(name, true), ms(time)),
-    function unsetTimeout(id) { clearTimeout(id); },
+    unsetTimeout,
     fn
   );
 
@@ -119,7 +132,7 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
   tick.timers[name] = new Timer(
     Timer.INTERVAL,
     setInterval(tick.tock(name), ms(time)),
-    function unsetInterval(id) { clearInterval(id); },
+    unsetInterval,
     fn
   );
 
@@ -147,7 +160,7 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   tick.timers[name] = new Timer(
     Timer.IMMEDIATE,
     setImmediate(tick.tock(name, true)),
-    function unsetImmediate(id) { clearImmediate(id); },
+    unsetImmediate,
     fn
   );
 
