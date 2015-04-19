@@ -4,6 +4,33 @@ var has = Object.prototype.hasOwnProperty
   , ms = require('millisecond');
 
 /**
+ * Timer instance.
+ *
+ * @constructor
+ * @param {Number} type Type of timer.
+ * @param {Object} timer New timer instance.
+ * @param {Function} clear Clears the timer instance.
+ * @param {Function} fn The functions that need to be executed.
+ * @api private
+ */
+function Timer(type, timer, clear, fn) {
+  this.clear = clear;
+  this.timer = timer;
+  this.type = type;
+  this.fns = [fn];
+}
+
+/**
+ * Various of Timer types.
+ *
+ * @type {Number}
+ * @api private
+ */
+Timer.TIMEOUT   = 1;
+Timer.INTERVAL  = 2;
+Timer.IMMEDIATE = 3;
+
+/**
  * Simple timer management.
  *
  * @constructor
@@ -62,11 +89,12 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
     return tick;
   }
 
-  tick.timers[name] = {
-    timer: setTimeout(tick.tock(name, true), ms(time)),
-    clear: function unsetTimeout(id) { clearTimeout(id); },
-    fns: [fn]
-  };
+  tick.timers[name] = new Timer(
+    Timer.TIMEOUT,
+    setTimeout(tick.tock(name, true), ms(time)),
+    function unsetTimeout(id) { clearTimeout(id); },
+    fn
+  );
 
   return tick;
 };
@@ -88,11 +116,12 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
     return tick;
   }
 
-  tick.timers[name] = {
-    timer: setInterval(tick.tock(name), ms(time)),
-    clear: function unsetInterval(id) { clearInterval(id); },
-    fns: [fn]
-  };
+  tick.timers[name] = new Timer(
+    Timer.INTERVAL,
+    setInterval(tick.tock(name), ms(time)),
+    function unsetInterval(id) { clearInterval(id); },
+    fn
+  );
 
   return tick;
 };
@@ -115,11 +144,12 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
     return tick;
   }
 
-  tick.timers[name] = {
-    timer: setImmediate(tick.tock(name, true)),
-    clear: function unsetImmediate(id) { clearImmediate(id); },
-    fns: [fn]
-  };
+  tick.timers[name] = new Timer(
+    Timer.IMMEDIATE,
+    setImmediate(tick.tock(name, true)),
+    function unsetImmediate(id) { clearImmediate(id); },
+    fn
+  );
 
   return tick;
 };
@@ -199,7 +229,7 @@ Tick.prototype.adjust = function adjust(name, time) {
 
   if (!timer) return tick;
 
-  interval = timer.clear.name === 'unsetInterval';
+  interval = timer.type === Timer.INTERVAL;
   timer.clear(timer.timer);
   timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
 
