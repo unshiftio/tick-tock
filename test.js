@@ -329,24 +329,22 @@ describe('ticktock', function () {
     });
 
     it('adjusts the interval', function (next) {
-      var ticked = false;
+      var start = Date.now()
+        , counter = 0
+        , elapsed;
 
       tock.setInterval('foo', function () {
-        var spend = Date.now() - start;
+        elapsed = Date.now() - start;
 
-        if (spend < 30) {
+        if (++counter === 1) {
+          assume(elapsed).is.below(30);
           tock.adjust('foo', '100 ms');
-          ticked = true;
-        } else if(spend < 150) {
-          if (!ticked) throw new Error('I should have ticked');
+        } else if (counter === 3) {
+          assume(elapsed).is.between(200, 250);
           tock.clear();
           next();
         }
-
-        start = Date.now();
       });
-
-      var start = Date.now();
     });
   });
 
