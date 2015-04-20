@@ -7,28 +7,16 @@ var has = Object.prototype.hasOwnProperty
  * Timer instance.
  *
  * @constructor
- * @param {Number} type Type of timer.
  * @param {Object} timer New timer instance.
  * @param {Function} clear Clears the timer instance.
  * @param {Function} fn The functions that need to be executed.
  * @api private
  */
-function Timer(type, timer, clear, fn) {
+function Timer(timer, clear, fn) {
   this.clear = clear;
   this.timer = timer;
-  this.type = type;
   this.fns = [fn];
 }
-
-/**
- * Various of Timer types.
- *
- * @type {Number}
- * @api private
- */
-Timer.TIMEOUT   = 1;
-Timer.INTERVAL  = 2;
-Timer.IMMEDIATE = 3;
 
 /**
  * Custom wrappers for the various of clear{whatever} functions. We cannot
@@ -103,7 +91,6 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
   }
 
   tick.timers[name] = new Timer(
-    Timer.TIMEOUT,
     setTimeout(tick.tock(name, true), ms(time)),
     unsetTimeout,
     fn
@@ -130,7 +117,6 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
   }
 
   tick.timers[name] = new Timer(
-    Timer.INTERVAL,
     setInterval(tick.tock(name), ms(time)),
     unsetInterval,
     fn
@@ -158,7 +144,6 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   }
 
   tick.timers[name] = new Timer(
-    Timer.IMMEDIATE,
     setImmediate(tick.tock(name, true)),
     unsetImmediate,
     fn
@@ -242,7 +227,7 @@ Tick.prototype.adjust = function adjust(name, time) {
 
   if (!timer) return tick;
 
-  interval = timer.type === Timer.INTERVAL;
+  interval = timer.clear === unsetInterval;
   timer.clear(timer.timer);
   timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
 
