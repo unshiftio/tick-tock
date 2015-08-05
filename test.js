@@ -357,6 +357,20 @@ describe('ticktock', function () {
       }, 500);
     });
 
+    it('also adjusts the timer instance start time', function (next) {
+      tock.setTimeout('timer', fail, '100 ms');
+
+      tock.adjust('timer', '1 second');
+
+      setTimeout(function () {
+        tock.adjust('timer', '1 second');
+        assume(tock.timers.timer.remaining()).is.between(999, 1000);
+
+        tock.clear();
+        next();
+      }, 10);
+    });
+
     it('adjusts the interval', function (next) {
       var start = Date.now()
         , counter = 0
