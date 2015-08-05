@@ -108,13 +108,14 @@ Tick.prototype.tock = function ticktock(name, clear) {
  */
 Tick.prototype.setTimeout = function timeout(name, fn, time) {
   var tick = this
-    , tock = ms(time);
+    , tock;
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
     return tick;
   }
 
+  tock = ms(time);
   tick.timers[name] = new Timer(
     setTimeout(tick.tock(name, true), ms(time)),
     unsetTimeout,
@@ -135,16 +136,19 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
  * @api public
  */
 Tick.prototype.setInterval = function interval(name, fn, time) {
-  var tick = this;
+  var tick = this
+    , tock;
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
     return tick;
   }
 
+  tock = ms(time);
   tick.timers[name] = new Timer(
     setInterval(tick.tock(name), ms(time)),
     unsetInterval,
+    tock,
     fn
   );
 
@@ -172,6 +176,7 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   tick.timers[name] = new Timer(
     setImmediate(tick.tock(name, true)),
     unsetImmediate,
+    0,
     fn
   );
 
@@ -226,21 +231,6 @@ Tick.prototype.clear = function clear() {
 };
 
 /**
- * We will no longer use this module, prepare your self for global cleanups.
- *
- * @returns {Boolean}
- * @api public
- */
-Tick.prototype.end = Tick.prototype.destroy = function end() {
-  if (!this.context) return false;
-
-  this.clear();
-  this.context = this.timers = null;
-
-  return true;
-};
-
-/**
  * Adjust a timeout or interval to a new duration.
  *
  * @returns {Tick}
@@ -259,6 +249,21 @@ Tick.prototype.adjust = function adjust(name, time) {
   timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
 
   return tick;
+};
+
+/**
+ * We will no longer use this module, prepare your self for global cleanups.
+ *
+ * @returns {Boolean}
+ * @api public
+ */
+Tick.prototype.end = Tick.prototype.destroy = function end() {
+  if (!this.context) return false;
+
+  this.clear();
+  this.context = this.timers = null;
+
+  return true;
 };
 
 //
