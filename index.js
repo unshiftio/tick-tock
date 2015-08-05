@@ -9,14 +9,37 @@ var has = Object.prototype.hasOwnProperty
  * @constructor
  * @param {Object} timer New timer instance.
  * @param {Function} clear Clears the timer instance.
+ * @param {Function} duration Duration of the timer.
  * @param {Function} fn The functions that need to be executed.
  * @api private
  */
-function Timer(timer, clear, fn) {
+function Timer(timer, clear, duration, fn) {
+  this.start = +(new Date());
+  this.duration = duration;
   this.clear = clear;
   this.timer = timer;
   this.fns = [fn];
 }
+
+/**
+ * Calculate the time left for a given timer.
+ *
+ * @returns {Number} Time in milliseconds.
+ * @api public
+ */
+Timer.prototype.remaining = function remaining() {
+  return this.duration - this.taken();
+};
+
+/**
+ * Calculate the amount of time it has taken since we've set the timer.
+ *
+ * @returns {Number}
+ * @api public
+ */
+Timer.prototype.taken = function taken() {
+  return +(new Date()) - this.start;
+};
 
 /**
  * Custom wrappers for the various of clear{whatever} functions. We cannot
@@ -66,6 +89,7 @@ Tick.prototype.tock = function ticktock(name, clear) {
       , i = 0;
 
     if (clear) tock.clear(name);
+    else tock.start = +new Date();
 
     for (; i < l; i++) {
       fns[i].call(tock.context);
@@ -83,16 +107,19 @@ Tick.prototype.tock = function ticktock(name, clear) {
  * @api public
  */
 Tick.prototype.setTimeout = function timeout(name, fn, time) {
-  var tick = this;
+  var tick = this
+    , tock;
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
     return tick;
   }
 
+  tock = ms(time);
   tick.timers[name] = new Timer(
     setTimeout(tick.tock(name, true), ms(time)),
     unsetTimeout,
+    tock,
     fn
   );
 
@@ -109,16 +136,19 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
  * @api public
  */
 Tick.prototype.setInterval = function interval(name, fn, time) {
-  var tick = this;
+  var tick = this
+    , tock;
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
     return tick;
   }
 
+  tock = ms(time);
   tick.timers[name] = new Timer(
     setInterval(tick.tock(name), ms(time)),
     unsetInterval,
+    tock,
     fn
   );
 
@@ -146,6 +176,7 @@ Tick.prototype.setImmediate = function immediate(name, fn) {
   tick.timers[name] = new Timer(
     setImmediate(tick.tock(name, true)),
     unsetImmediate,
+    0,
     fn
   );
 
@@ -200,6 +231,29 @@ Tick.prototype.clear = function clear() {
 };
 
 /**
+ * Adjust a timeout or interval to a new duration.
+ *
+ * @returns {Tick}
+ * @api public
+ */
+Tick.prototype.adjust = function adjust(name, time) {
+  var interval
+    , tick = this
+    , tock = ms(time)
+    , timer = tick.timers[name];
+
+  if (!timer) return tick;
+
+  interval = timer.clear === unsetInterval;
+  timer.clear(timer.timer);
+  timer.start = +(new Date());
+  timer.duration = tock;
+  timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), tock);
+
+  return tick;
+};
+
+/**
  * We will no longer use this module, prepare your self for global cleanups.
  *
  * @returns {Boolean}
@@ -214,27 +268,8 @@ Tick.prototype.end = Tick.prototype.destroy = function end() {
   return true;
 };
 
-/**
- * Adjust a timeout or interval to a new duration.
- *
- * @returns {Tick}
- * @api public
- */
-Tick.prototype.adjust = function adjust(name, time) {
-  var interval
-    , tick = this
-    , timer = tick.timers[name];
-
-  if (!timer) return tick;
-
-  interval = timer.clear === unsetInterval;
-  timer.clear(timer.timer);
-  timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
-
-  return tick;
-};
-
 //
 // Expose the timer factory.
 //
+Tick.Timer = Timer;
 module.exports = Tick;

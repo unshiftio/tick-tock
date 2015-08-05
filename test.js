@@ -4,6 +4,7 @@ describe('ticktock', function () {
 
   var assume = require('assume')
     , Tick = require('./')
+    , Timer = Tick.Timer
     , tock;
 
   function fail() {
@@ -35,6 +36,34 @@ describe('ticktock', function () {
     var tick = Tick();
 
     assume(tick).is.instanceOf(Tick);
+  });
+
+  describe('Timer', function () {
+    describe('#taken', function () {
+      it('calculates the time it has taken since first creation', function (next) {
+        var timer = new Timer(undefined, undefined, 100);
+
+        assume(timer.taken()).between(0, 1);
+
+        setTimeout(function () {
+          assume(timer.taken()).between(5, 15);
+          next();
+        }, 10);
+      });
+    });
+
+    describe('#remaining', function () {
+      it('calculates the time remaining', function (next) {
+        var timer = new Timer(undefined, undefined, 100);
+
+        assume(timer.remaining()).between(99, 100);
+
+        setTimeout(function () {
+          assume(timer.remaining()).between(20, 35);
+          next();
+        }, 70);
+      });
+    });
   });
 
   describe('#tock', function () {
@@ -326,6 +355,23 @@ describe('ticktock', function () {
         tock.clear();
         next();
       }, 500);
+    });
+
+    it('also adjusts the timer instance start time', function (next) {
+      tock.setTimeout('timer', fail, '100 ms');
+
+      setTimeout(function () {
+        assume(tock.timers.timer.remaining()).is.between(80, 90);
+        assume(tock.timers.timer.taken()).is.between(5, 15);
+
+        tock.adjust('timer', '1 second');
+
+        assume(tock.timers.timer.taken()).is.between(0, 1);
+        assume(tock.timers.timer.remaining()).is.between(999, 1000);
+
+        tock.clear();
+        next();
+      }, 10);
     });
 
     it('adjusts the interval', function (next) {
