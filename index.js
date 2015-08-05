@@ -269,4 +269,5 @@ Tick.prototype.end = Tick.prototype.destroy = function end() {
 //
 // Expose the timer factory.
 //
+Tick.Timer = Timer;
 module.exports = Tick;
