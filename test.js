@@ -4,6 +4,7 @@ describe('ticktock', function () {
 
   var assume = require('assume')
     , Tick = require('./')
+    , Timer = Tick.Timer
     , tock;
 
   function fail() {
@@ -35,6 +36,34 @@ describe('ticktock', function () {
     var tick = Tick();
 
     assume(tick).is.instanceOf(Tick);
+  });
+
+  describe('Timer', function () {
+    describe('#taken', function () {
+      it('calculates the time it has taken since first creation', function (next) {
+        var timer = new Timer(undefined, undefined, 100);
+
+        assume(timer.taken()).between(0, 1);
+
+        setTimeout(function () {
+          assume(timer.taken()).between(5, 15);
+          next();
+        }, 10);
+      });
+    });
+
+    describe('#remaining', function () {
+      it('calculates the time remaining', function (next) {
+        var timer = new Timer(undefined, undefined, 100);
+
+        assume(timer.remaining()).between(99, 100);
+
+        setTimeout(function () {
+          assume(timer.remaining()).between(25, 35);
+          next();
+        }, 70);
+      });
+    });
   });
 
   describe('#tock', function () {
