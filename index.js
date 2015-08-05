@@ -9,14 +9,37 @@ var has = Object.prototype.hasOwnProperty
  * @constructor
  * @param {Object} timer New timer instance.
  * @param {Function} clear Clears the timer instance.
+ * @param {Function} duration Duration of the timer.
  * @param {Function} fn The functions that need to be executed.
  * @api private
  */
-function Timer(timer, clear, fn) {
+function Timer(timer, clear, duration, fn) {
+  this.start = +(new Date());
+  this.duration = duration;
   this.clear = clear;
   this.timer = timer;
   this.fns = [fn];
 }
+
+/**
+ * Calculate the time left for a given timer.
+ *
+ * @returns {Number} Time in milliseconds.
+ * @api public
+ */
+Timer.prototype.remaining = function remaining() {
+  return this.duration - this.taken();
+};
+
+/**
+ * Calculate the amount of time it has taken since we've set the timer.
+ *
+ * @returns {Number}
+ * @api public
+ */
+Timer.prototype.taken = function taken() {
+  return +(new Date()) - this.start;
+};
 
 /**
  * Custom wrappers for the various of clear{whatever} functions. We cannot
@@ -66,6 +89,7 @@ Tick.prototype.tock = function ticktock(name, clear) {
       , i = 0;
 
     if (clear) tock.clear(name);
+    else tock.start = +new Date();
 
     for (; i < l; i++) {
       fns[i].call(tock.context);
@@ -83,7 +107,8 @@ Tick.prototype.tock = function ticktock(name, clear) {
  * @api public
  */
 Tick.prototype.setTimeout = function timeout(name, fn, time) {
-  var tick = this;
+  var tick = this
+    , tock = ms(time);
 
   if (tick.timers[name]) {
     tick.timers[name].fns.push(fn);
@@ -93,6 +118,7 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
   tick.timers[name] = new Timer(
     setTimeout(tick.tock(name, true), ms(time)),
     unsetTimeout,
+    tock,
     fn
   );
 
@@ -229,6 +255,7 @@ Tick.prototype.adjust = function adjust(name, time) {
 
   interval = timer.clear === unsetInterval;
   timer.clear(timer.timer);
+  timer.start = +(new Date());
   timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
 
   return tick;
