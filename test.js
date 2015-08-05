@@ -59,7 +59,7 @@ describe('ticktock', function () {
         assume(timer.remaining()).between(99, 100);
 
         setTimeout(function () {
-          assume(timer.remaining()).between(25, 35);
+          assume(timer.remaining()).between(20, 35);
           next();
         }, 70);
       });
@@ -360,10 +360,13 @@ describe('ticktock', function () {
     it('also adjusts the timer instance start time', function (next) {
       tock.setTimeout('timer', fail, '100 ms');
 
-      tock.adjust('timer', '1 second');
-
       setTimeout(function () {
+        assume(tock.timers.timer.remaining()).is.between(80, 90);
+        assume(tock.timers.timer.taken()).is.between(9, 12);
+
         tock.adjust('timer', '1 second');
+
+        assume(tock.timers.timer.taken()).is.between(0, 1);
         assume(tock.timers.timer.remaining()).is.between(999, 1000);
 
         tock.clear();
