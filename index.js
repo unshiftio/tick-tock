@@ -239,6 +239,7 @@ Tick.prototype.clear = function clear() {
 Tick.prototype.adjust = function adjust(name, time) {
   var interval
     , tick = this
+    , tock = ms(time)
     , timer = tick.timers[name];
 
   if (!timer) return tick;
@@ -246,7 +247,8 @@ Tick.prototype.adjust = function adjust(name, time) {
   interval = timer.clear === unsetInterval;
   timer.clear(timer.timer);
   timer.start = +(new Date());
-  timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), ms(time));
+  timer.duration = tock;
+  timer.timer = (interval ? setInterval : setTimeout)(tick.tock(name, !interval), tock);
 
   return tick;
 };
