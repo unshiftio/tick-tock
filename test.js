@@ -369,7 +369,7 @@ describe('ticktock', function () {
       tock.setTimeout('timer', fail, '100 ms');
 
       setTimeout(function () {
-        assume(tock.timers.timer.remaining()).is.between(80, 90);
+        assume(tock.timers.timer.remaining()).is.between(80, 95);
         assume(tock.timers.timer.taken()).is.between(5, 15);
 
         tock.adjust('timer', '1 second');
