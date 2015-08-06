@@ -16,7 +16,7 @@ describe('ticktock', function () {
   //
   Object.prototype.checkHasOwn = true;
 
-  context = { foo: 'bar' };
+  var context = { foo: 'bar' };
 
   beforeEach(function () {
     tock = new Tick();
@@ -139,8 +139,7 @@ describe('ticktock', function () {
     });
 
     it('run with the same timeout if a known name is provided', function (next) {
-      var start = Date.now()
-        , j = 0
+      var j = 0
         , i = 0;
 
       tock.setInterval('test', function () {
@@ -157,6 +156,15 @@ describe('ticktock', function () {
           }
         }, '100 ms');
       }, 20);
+    });
+
+    it('updates the start time of the timer instance', function (next) {
+      tock.setInterval('timer', function () {}, 100);
+
+      setTimeout(function () {
+        assume(tock.timers.timer.remaining()).is.between(40, 65);
+        next();
+      }, 250);
     });
   });
 
