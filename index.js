@@ -89,7 +89,7 @@ Tick.prototype.tock = function ticktock(name, clear) {
       , i = 0;
 
     if (clear) tock.clear(name);
-    else tock.start = +new Date();
+    else timer.start = +new Date();
 
     for (; i < l; i++) {
       fns[i].call(tock.context);
