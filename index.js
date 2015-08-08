@@ -117,7 +117,7 @@ Tick.prototype.setTimeout = function timeout(name, fn, time) {
 
   tock = ms(time);
   tick.timers[name] = new Timer(
-    setTimeout(tick.tock(name, true), ms(time)),
+    setTimeout(tick.tock(name, true), tock),
     unsetTimeout,
     tock,
     fn
@@ -146,7 +146,7 @@ Tick.prototype.setInterval = function interval(name, fn, time) {
 
   tock = ms(time);
   tick.timers[name] = new Timer(
-    setInterval(tick.tock(name), ms(time)),
+    setInterval(tick.tock(name), tock),
     unsetInterval,
     tock,
     fn
