@@ -33,7 +33,7 @@
     "assume": "~1.4.1",
     "istanbul": "~0.4.5",
     "mocha": "~3.2.0",
-    "pre-commit": "1.1.x"
+    "pre-commit": "~1.2.0"
   },
   "dependencies": {
     "millisecond": "0.1.x"
